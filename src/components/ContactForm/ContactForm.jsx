@@ -3,14 +3,16 @@ import * as Yup from "yup";
 import { nanoid } from "nanoid";
 import { useId } from "react";
 import css from "../ContactForm/ContactForm.module.css";
+import { useDispatch } from "react-redux";
+import { addContact } from "../../redux/contactsSlice";
+
+const phoneRegExp =
+  /^(\+?\d{1,4}[\s-]?)?\(?\d{1,4}?\)?[\s-]?\d{1,4}[\s-]?\d{1,9}$/;
 
 const initialValues = {
   name: "",
   number: "",
 };
-
-const phoneRegExp =
-  /^(\+?\d{1,4}[\s-]?)?\(?\d{1,4}?\)?[\s-]?\d{1,4}[\s-]?\d{1,9}$/;
 
 const ContactSchema = Yup.object().shape({
   name: Yup.string()
@@ -22,12 +24,20 @@ const ContactSchema = Yup.object().shape({
     .required("Required"),
 });
 
-export default function ContactForm({ onAdd }) {
+export default function ContactForm() {
   const nameFieldId = useId();
-  const namberFieldId = useId();
+  const numberFieldId = useId();
+
+  const dispatch = useDispatch();
 
   const handleSubmit = (values, actions) => {
-    onAdd({ id: nanoid(), name: values.name, number: values.number });
+    dispatch(
+      addContact({
+        id: nanoid(),
+        name: values.name,
+        number: values.number,
+      })
+    );
     actions.resetForm();
   };
 
@@ -47,7 +57,8 @@ export default function ContactForm({ onAdd }) {
           component="div"
           className={css.messageError}
         />
-        <label htmlFor={namberFieldId} className={css.inputLable}>
+
+        <label htmlFor={numberFieldId} className={css.inputLable}>
           Number
         </label>
         <Field type="text" name="number" className={css.input} />
@@ -56,6 +67,7 @@ export default function ContactForm({ onAdd }) {
           component="div"
           className={css.messageError}
         />
+
         <button type="submit" className={css.btn}>
           Add contact
         </button>
